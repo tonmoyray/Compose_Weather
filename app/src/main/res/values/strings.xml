@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name" translatable="false">Weather</string>
+    <string name="location_permission_granted">Location permission granted</string>
+    <string name="location_permission_denied">Location permission denied</string>
+    <string name="location_permission_settings">Navigate to settings and enable the Storage permission</string>
+    <string name="location_permission_rationale">Location permission is required by this app</string>
+    <string name="location_error">Failed to get location</string>
+    <string name="location_loading">Location is loading</string>
+    <string name="location_success">Latitude:%s Longitude:%s</string>
+    <string name="accept">Accept</string>
+    <string name="get_current_location">Get current location</string>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="location_permission_granted">Location Permission Granted</string>
+    <string name="location_permission_denied">Location Permission Denied</string>
+    <string name="location_permission_settings">Navigate to settings and enable the Storage permission</string>
+    <string name="location_permission_rationale">Location permission is required by this app</string>
+</resources>
+
