@@ -2,6 +2,7 @@ package com.ray.weather.ui
 
 import android.Manifest
 import android.location.Location
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
@@ -26,9 +27,10 @@ import com.ray.weather.R
 import com.ray.weather.WeatherViewModel
 import com.ray.weather.data.remote.model.ForecastNetworkResponse
 
-sealed interface CurrentWeather {
-    object Loading: CurrentWeather
-    data class Success(val forecastNetworkResponse: ForecastNetworkResponse): CurrentWeather
+sealed interface CurrentWeatherUiState {
+    object None: CurrentWeatherUiState
+    object Loading: CurrentWeatherUiState
+    data class Success(val forecastNetworkResponse: ForecastNetworkResponse): CurrentWeatherUiState
 }
 
 sealed interface CurrentLocationUiState {
@@ -97,6 +99,30 @@ fun CurrentLocationScreen(
             }
         }
     }
+}
+
+@Composable
+fun CurrentWeatherScreen(
+    viewModel: WeatherViewModel = hiltViewModel(),
+){
+    val currentWeatherUiState = viewModel.currentWeatherUiState.collectAsStateWithLifecycle()
+
+    when(currentWeatherUiState.value){
+        is CurrentWeatherUiState.Success -> {
+            Log.wtf("cray", " success "+ (currentWeatherUiState.value as CurrentWeatherUiState.Success).forecastNetworkResponse)
+        }
+        is CurrentWeatherUiState.Loading -> {
+            Log.wtf("cray"," CurrentWeatherUiState Loading")
+        }
+        is CurrentWeatherUiState.None -> {
+            Log.wtf("cray"," CurrentWeatherUiState None")
+        }
+        else -> {
+            Log.wtf("cray"," CurrentWeatherUiState else")
+        }
+    }
+
+
 }
 
 

@@ -9,7 +9,7 @@ class GetCurrentWeatherUseCase @Inject constructor(
     private val offlineFirstWeatherRepository: OfflineFirstWeatherRepository
 ) {
 
-    operator fun invoke(lat: Long = 52.52.toLong(), lng: Long = 13.41.toLong() ): Flow<ForecastNetworkResponse> {
+    operator fun invoke(lat: Double, lng: Double): Flow<ForecastNetworkResponse> {
         return offlineFirstWeatherRepository.getCurrentWeather(lat, lng)
     }
 }

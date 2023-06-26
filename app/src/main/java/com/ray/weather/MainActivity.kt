@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.ray.weather.ui.CurrentLocationScreen
+import com.ray.weather.ui.CurrentWeatherScreen
 import com.ray.weather.ui.theme.WeatherTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -14,6 +15,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             WeatherTheme {
                 CurrentLocationScreen()
+                CurrentWeatherScreen()
             }
         }
     }
