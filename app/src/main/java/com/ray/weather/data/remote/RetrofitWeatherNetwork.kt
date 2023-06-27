@@ -23,11 +23,12 @@ class RetrofitWeatherNetwork @Inject constructor(
         .addConverterFactory(
             networkJson.asConverterFactory("application/json".toMediaType())
         )
+        .addCallAdapterFactory(NetworkResultCallAdapterFactory.create())
         .build()
         .create(RetrofitNiaNetworkApi::class.java)
 
 
-    override suspend fun getCurrentWeather(lat: Double, lng: Double): ForecastNetworkResponse {
+    override suspend fun getCurrentWeather(lat: Double, lng: Double): NetworkResult<ForecastNetworkResponse> {
         return  networkApi.getCurrentWeather(lat, lng, true)
     }
 }
@@ -43,7 +44,7 @@ private interface RetrofitNiaNetworkApi {
     suspend fun getCurrentWeather(
         @Query("latitude") lat: Double,
         @Query("longitude") lng: Double,
-        @Query("current_weather") currentWeather: Boolean,
-    ): ForecastNetworkResponse
+        @Query("current_weather") currentWeather: Boolean
+    ): NetworkResult<ForecastNetworkResponse>
 
 }

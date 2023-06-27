@@ -9,4 +9,5 @@
     <string name="location_success">Latitude:%s Longitude:%s</string>
     <string name="accept">Accept</string>
     <string name="get_current_location">Get current location</string>
+    <string name="temperature">%d °C</string>
 </resources>

@@ -1,8 +1,12 @@
 package com.ray.weather
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ray.weather.data.remote.NetworkError
+import com.ray.weather.data.remote.NetworkException
+import com.ray.weather.data.remote.NetworkSuccess
 import com.ray.weather.domain.GetCurrentLocationUseCase
 import com.ray.weather.domain.GetCurrentWeatherUseCase
 import com.ray.weather.ui.CurrentLocationUiState
@@ -36,18 +40,22 @@ class WeatherViewModel @Inject constructor(
             if(it is CurrentLocationUiState.Success){
                 getCurrentWeatherUseCase.invoke(it.location.latitude, it.location.longitude)
             }else{
-                flowOf(null)
+                flowOf(null)  //TODO
             }
         }.map {
-            if(it != null){
-                CurrentWeatherUiState.Success(it)
-            }else{
-                CurrentWeatherUiState.None
+
+            Log.wtf("cray"," map "+it)
+
+            when(it){
+                is NetworkSuccess -> CurrentWeatherUiState.Success(it.data)
+                is NetworkError -> CurrentWeatherUiState.Error(it.code, it.message, null)
+                is NetworkException -> CurrentWeatherUiState.Error(null, null, it.e)
+                else -> {null}
             }
         }.stateIn(
             scope = viewModelScope,
             started= SharingStarted.WhileSubscribed(5_000),
-            initialValue = CurrentWeatherUiState.None,
+            initialValue = null,
         )
 
     fun getCurrentLocation() {

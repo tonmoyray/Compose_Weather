@@ -5,7 +5,7 @@ import android.location.Location
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,8 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,9 +29,9 @@ import com.ray.weather.WeatherViewModel
 import com.ray.weather.data.remote.model.ForecastNetworkResponse
 
 sealed interface CurrentWeatherUiState {
-    object None: CurrentWeatherUiState
     object Loading: CurrentWeatherUiState
     data class Success(val forecastNetworkResponse: ForecastNetworkResponse): CurrentWeatherUiState
+    data class Error(val code: Int?, val message: String?, val throwable: Throwable?): CurrentWeatherUiState
 }
 
 sealed interface CurrentLocationUiState {
@@ -68,7 +69,6 @@ fun CurrentLocationScreen(
             targetState = locationPermissionsState.allPermissionsGranted
         ) { areGranted ->
             Column(
-                Modifier.background(Color.Red),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
@@ -114,16 +114,43 @@ fun CurrentWeatherScreen(
         is CurrentWeatherUiState.Loading -> {
             Log.wtf("cray"," CurrentWeatherUiState Loading")
         }
-        is CurrentWeatherUiState.None -> {
-            Log.wtf("cray"," CurrentWeatherUiState None")
-        }
         else -> {
             Log.wtf("cray"," CurrentWeatherUiState else")
         }
     }
-
-
 }
+
+@Preview
+@Composable
+fun CurrentWeather(){
+
+    Column() {
+        Text(text = "Dhaka")
+        Text(text = stringResource(id = R.string.temperature, 31))
+        Text(text = "Jan, 04, 2023")
+        Image(painter = painterResource(id = R.drawable.ic_clear_day), contentDescription = null)
+    }
+}
+
+
+
+/*
+
+0 	Clear sky
+1, 2, 3 	Mainly clear, partly cloudy, and overcast
+45, 48 	Fog and depositing rime fog
+51, 53, 55 	Drizzle: Light, moderate, and dense intensity
+56, 57 	Freezing Drizzle: Light and dense intensity
+61, 63, 65 	Rain: Slight, moderate and heavy intensity
+66, 67 	Freezing Rain: Light and heavy intensity
+71, 73, 75 	Snow fall: Slight, moderate, and heavy intensity
+77 	Snow grains
+80, 81, 82 	Rain showers: Slight, moderate, and violent
+85, 86 	Snow showers slight and heavy
+95 * 	Thunderstorm: Slight or moderate
+96, 99 * 	Thunderstorm with slight and heavy hail
+
+*/
 
 
 

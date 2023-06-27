@@ -7,6 +7,6 @@ import com.ray.weather.data.remote.model.ForecastNetworkResponse
  */
 interface WeatherNetworkDataSource {
 
-    suspend fun getCurrentWeather(lat: Double, lng: Double): ForecastNetworkResponse
+    suspend fun getCurrentWeather(lat: Double, lng: Double): NetworkResult<ForecastNetworkResponse>
 
 }
