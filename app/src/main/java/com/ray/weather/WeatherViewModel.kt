@@ -3,6 +3,7 @@ package com.ray.weather
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ray.weather.data.model.CurrentWeatherUiModel
 import com.ray.weather.data.remote.NetworkError
 import com.ray.weather.data.remote.NetworkException
 import com.ray.weather.data.remote.NetworkSuccess
@@ -33,10 +34,24 @@ class WeatherViewModel @Inject constructor(
         viewModelScope.launch {
             getCurrentLocationUseCase.getCurrentLocation(application).let {currentLocation->
                 if(currentLocation != null){
+                    _currentLocationUiState.value = CurrentWeatherUiState.LocationSuccess(currentLocation)
                     _currentLocationUiState.value = getCurrentWeatherUseCase.invoke(currentLocation.latitude, currentLocation.longitude)
                         .mapLatest { networkResult ->
                             when(networkResult){
-                                is NetworkSuccess -> CurrentWeatherUiState.WeatherSuccess(networkResult.data)
+                                is NetworkSuccess -> {
+                                    CurrentWeatherUiState.WeatherSuccess(
+                                        CurrentWeatherUiModel(
+                                            currentLocation.city,
+                                            currentLocation.country,
+                                            networkResult.data.currentWeatherNetworkResponse.temperature,
+                                            networkResult.data.currentWeatherNetworkResponse.windDirection,
+                                            networkResult.data.currentWeatherNetworkResponse.windSpeed,
+                                            networkResult.data.currentWeatherNetworkResponse.weatherCode,
+                                            networkResult.data.currentWeatherNetworkResponse.isDay,
+                                            networkResult.data.currentWeatherNetworkResponse.time,
+                                        )
+                                    )
+                                }
                                 is NetworkError -> CurrentWeatherUiState.WeatherError(networkResult.code, networkResult.message, null)
                                 is NetworkException -> CurrentWeatherUiState.WeatherError(null, null, networkResult.e)
                             }

@@ -33,14 +33,17 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.ray.weather.R
 import com.ray.weather.WeatherViewModel
+import com.ray.weather.data.model.CurrentWeatherUiModel
+import com.ray.weather.data.model.LocationUiModel
 import com.ray.weather.data.remote.model.ForecastNetworkResponse
 import com.ray.weather.ui.theme.Purple80
 
 sealed interface CurrentWeatherUiState {
     object LocationLoading: CurrentWeatherUiState
+    data class LocationSuccess(val locationUiModel: LocationUiModel): CurrentWeatherUiState
     object LocationError: CurrentWeatherUiState
     object WeatherLoading: CurrentWeatherUiState
-    data class WeatherSuccess(val forecastNetworkResponse: ForecastNetworkResponse): CurrentWeatherUiState
+    data class WeatherSuccess(val currentWeatherUiModel: CurrentWeatherUiModel): CurrentWeatherUiState
     data class WeatherError(val code: Int?, val message: String?, val throwable: Throwable?): CurrentWeatherUiState
 }
 
@@ -78,7 +81,9 @@ fun CurrentLocationScreen(
     }
 
     Box(
-        modifier = Modifier.fillMaxSize().background(color = Purple80),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Purple80),
         contentAlignment = Alignment.Center,
         ) {
         AnimatedContent(
@@ -91,19 +96,40 @@ fun CurrentLocationScreen(
                 if (areGranted) {
                     when(currentWeatherUiState.value){
                         CurrentWeatherUiState.LocationLoading->{
-                            Log.wtf("cray", " LocationLoading ");
+                            Log.wtf("cray", " LocationLoading ")
                             Text(text = stringResource(id = R.string.location_loading))
                         }
+                        is CurrentWeatherUiState.LocationSuccess->{
+                            Log.wtf("cray", " LocationLoading ")
+                            val locationModel = (currentWeatherUiState.value as CurrentWeatherUiState.LocationSuccess).locationUiModel
+                            Column() {
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = locationModel.city,
+                                    textAlign = TextAlign.Center,
+                                    color = Color.White,
+                                    fontFamily = fontFamily,
+                                    style = MaterialTheme.typography.headlineLarge,
+                                )
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = locationModel.country,
+                                    textAlign = TextAlign.Center,
+                                    color = Color.White,
+                                    fontFamily = fontFamily,
+                                    style = MaterialTheme.typography.headlineMedium,
+                                )
+                            }
+                        }
                         is CurrentWeatherUiState.LocationError->{
-                            Log.wtf("cray", " LocationError ");
+                            Log.wtf("cray", " LocationError ")
                             Text(text = stringResource(id = R.string.location_error))
                         }
                         is CurrentWeatherUiState.WeatherSuccess -> {
-                            Log.wtf("cray", " success "+ (currentWeatherUiState.value as CurrentWeatherUiState.WeatherSuccess).forecastNetworkResponse)
-                            val forecastNetworkResponse = (currentWeatherUiState.value as CurrentWeatherUiState.WeatherSuccess).forecastNetworkResponse
-                            val temperature = forecastNetworkResponse.currentWeatherNetworkResponse.temperature
-                            val weatherCode = forecastNetworkResponse.currentWeatherNetworkResponse.weatherCode
-                            val isDay = forecastNetworkResponse.currentWeatherNetworkResponse.isDay
+                            Log.wtf("cray", " success "+ (currentWeatherUiState.value as CurrentWeatherUiState.WeatherSuccess).currentWeatherUiModel)
+                            val currentWeatherUiModel = (currentWeatherUiState.value as CurrentWeatherUiState.WeatherSuccess).currentWeatherUiModel
+                            val weatherCode = currentWeatherUiModel.weatherCode
+                            val isDay = currentWeatherUiModel.isDay
 
                             val weatherIcon =
                                 when(weatherCode){
@@ -137,11 +163,19 @@ fun CurrentLocationScreen(
                             Column() {
                                 Text(
                                     modifier = Modifier.fillMaxWidth(),
-                                    text = "Dhaka",
+                                    text = currentWeatherUiModel.city,
                                     textAlign = TextAlign.Center,
                                     color = Color.White,
                                     fontFamily = fontFamily,
                                     style = MaterialTheme.typography.headlineLarge,
+                                )
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = currentWeatherUiModel.country,
+                                    textAlign = TextAlign.Center,
+                                    color = Color.White,
+                                    fontFamily = fontFamily,
+                                    style = MaterialTheme.typography.headlineMedium,
                                 )
                                 Image(
                                     modifier = Modifier.fillMaxWidth(),
@@ -150,7 +184,7 @@ fun CurrentLocationScreen(
                                 )
                                 Text(
                                     modifier = Modifier.fillMaxWidth(),
-                                    text = stringResource(id = R.string.temperature, temperature.toString()),
+                                    text = stringResource(id = R.string.temperature, currentWeatherUiModel.temperature.toString()),
                                     color = Color.White,
                                     textAlign = TextAlign.Center,
                                     fontFamily = fontFamily,
@@ -158,7 +192,7 @@ fun CurrentLocationScreen(
                                 )
                                 Text(
                                     modifier = Modifier.fillMaxWidth(),
-                                    text = "Jan, 04, 2023",
+                                    text = currentWeatherUiModel.time,
                                     textAlign = TextAlign.Center,
                                     color = Color.White,
                                     style = MaterialTheme.typography.titleLarge,
