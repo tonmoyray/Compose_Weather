@@ -1,16 +1,19 @@
 package com.ray.weather.data.remote
 
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.ray.weather.data.remote.model.ForecastNetworkResponse
+import kotlinx.serialization.json.Json
 import okhttp3.Call
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class RetrofitNiaNetwork @Inject constructor(
+class RetrofitWeatherNetwork @Inject constructor(
+    networkJson: Json,
     okhttpCallFactory: Call.Factory,
 ) : WeatherNetworkDataSource {
 
@@ -18,14 +21,15 @@ class RetrofitNiaNetwork @Inject constructor(
         .baseUrl("https://api.open-meteo.com")
         .callFactory(okhttpCallFactory)
         .addConverterFactory(
-            GsonConverterFactory.create()
+            networkJson.asConverterFactory("application/json".toMediaType())
         )
+        .addCallAdapterFactory(NetworkResultCallAdapterFactory.create())
         .build()
         .create(RetrofitNiaNetworkApi::class.java)
 
 
-    override suspend fun getCurrentWeather(lat: Long, lng: Long): ForecastNetworkResponse {
-        return  networkApi.getCurrentWeather(lat, lng, true).data
+    override suspend fun getCurrentWeather(lat: Double, lng: Double): NetworkResult<ForecastNetworkResponse> {
+        return  networkApi.getCurrentWeather(lat, lng, true)
     }
 }
 
@@ -38,14 +42,9 @@ class RetrofitNiaNetwork @Inject constructor(
 private interface RetrofitNiaNetworkApi {
     @GET(value = "v1/forecast")
     suspend fun getCurrentWeather(
-        @Query("latitude") lat: Long,
-        @Query("longitude") lng: Long,
-        @Query("current_weather") currentWeather: Boolean,
-    ): NetworkResponse<ForecastNetworkResponse>
+        @Query("latitude") lat: Double,
+        @Query("longitude") lng: Double,
+        @Query("current_weather") currentWeather: Boolean
+    ): NetworkResult<ForecastNetworkResponse>
 
 }
-
-
-private data class NetworkResponse<T>(
-    val data: T,
-)

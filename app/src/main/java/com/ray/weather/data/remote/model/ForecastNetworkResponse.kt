@@ -1,9 +1,11 @@
 package com.ray.weather.data.remote.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ForecastNetworkResponse(
-    @SerializedName("latitude") val latitude: Long,
-    @SerializedName("longitude") val longitude: Long,
-    @SerializedName("current_weather") val currentWeatherNetworkResponse: CurrentWeatherNetworkResponse
+    @SerialName("latitude")  val latitude: Double,
+    @SerialName("longitude") val longitude: Double,
+    @SerialName("current_weather") val currentWeatherNetworkResponse: CurrentWeatherNetworkResponse
 )
